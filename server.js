@@ -2,6 +2,14 @@
 var express = require('express'),
     app     = express(),
     morgan  = require('morgan');
+	
+var fs = require('fs');	
+var http = require('http');
+var https = require('https');	
+
+var privateKey  = fs.readFileSync('sslcert/ssl.key', 'utf8');
+var certificate = fs.readFileSync('sslcert/ssl.crt', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
     
 Object.assign=require('object-assign')
 
@@ -100,6 +108,13 @@ initDb(function(err){
 });
 
 app.listen(port, ip);
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(port);
+httpsServer.listen(8443);
+
 console.log('Server running on http://%s:%s', ip, port);
 
 module.exports = app ;
